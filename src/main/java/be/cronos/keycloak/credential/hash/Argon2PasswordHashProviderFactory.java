@@ -1,5 +1,7 @@
 package be.cronos.keycloak.credential.hash;
 
+import de.mkammerer.argon2.Argon2Factory;
+import de.mkammerer.argon2.Argon2Factory.Argon2Types;
 import org.jboss.logging.Logger;
 import org.keycloak.Config;
 import org.keycloak.credential.hash.PasswordHashProvider;
@@ -12,7 +14,7 @@ public class Argon2PasswordHashProviderFactory implements PasswordHashProviderFa
 
     public static final String ID = "argon2";
 
-    public static final String HASHING_ALGORITHM = "argon2id";
+//    public static final String HASHING_ALGORITHM = "argon2id";
 
     public static final int DEFAULT_ITERATIONS = 1;
 
@@ -22,17 +24,21 @@ public class Argon2PasswordHashProviderFactory implements PasswordHashProviderFa
 
     @Override
     public PasswordHashProvider create(KeycloakSession session) {
-//        return new Pbkdf2PasswordHashProvider(ID, HASHING_ALGORITHM, 20000);
-        LOG.errorf("Argon2 Factory");
-        return new Argon2PasswordHashProvider(ID, HASHING_ALGORITHM, DEFAULT_ITERATIONS, DEFAULT_MEMORY, DEFAULT_PARALLELISM);
+        LOG.debugf("Argon2PasswordHashProviderFactory create()");
+
+        // Using PasswordPolicy here will generate a StackOverflowError when you change a value.
+//        return new Argon2PasswordHashProvider(ID, Argon2Factory.Argon2Types.ARGON2id, DEFAULT_ITERATIONS, DEFAULT_MEMORY, DEFAULT_PARALLELISM, session.getContext().getRealm().getPasswordPolicy());
+        return new Argon2PasswordHashProvider(ID, Argon2Types.ARGON2id, DEFAULT_ITERATIONS, DEFAULT_MEMORY, DEFAULT_PARALLELISM);
     }
 
     @Override
     public void init(Config.Scope config) {
+        LOG.debugf("Argon2PasswordHashProviderFactory init()");
     }
 
     @Override
     public void postInit(KeycloakSessionFactory factory) {
+        LOG.debugf("Argon2PasswordHashProviderFactory postInit()");
     }
 
     @Override

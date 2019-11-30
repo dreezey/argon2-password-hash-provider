@@ -55,5 +55,10 @@ Once the dependencies are in order, you can deploy the module either via the `mo
 Finally, in the Keycloak realm of your choosing, activate the Argon2 password hashing via:
 `Authentication > Password Policy` and then selecting the policy `Hashing Algorithm` and name it: `argon2`.
 
-Important next step is to change the iterations, select the policy `Hashing Iterations` and change it to either `1` or `2`.
-Or perform the benchmark on your system using the [project's benchmark](https://github.com/phxql/argon2-jvm#recommended-parameters).
+Further tuning can be done by the other Policy Providers:
+* `Argon2 Variant` --> you can choose which Argon2 variant to use, either: ARGON2i, ARGON2d or ARGON2id
+* `Argon2 Iterations` --> tune the number of iterations the provider will perform
+* `Argon2 Memory Usage` --> tune the memory limitation of the provider
+* `Argon2 Paralellism` --> tune the number of threads and memory lanes
+
+For optimized parameters, check the [project's benchmark](https://github.com/phxql/argon2-jvm#recommended-parameters).
