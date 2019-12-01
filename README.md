@@ -60,5 +60,10 @@ Further tuning can be done by the other Policy Providers:
 * `Argon2 Iterations` --> tune the number of iterations the provider will perform
 * `Argon2 Memory Usage` --> tune the memory limitation of the provider
 * `Argon2 Paralellism` --> tune the number of threads and memory lanes
+* `Argon2 Salt Length` --> tune the length of the salt
+* `Argon2 Hash Length` --> tune the length of the hash
 
-For optimized parameters, check the [project's benchmark](https://github.com/phxql/argon2-jvm#recommended-parameters).
+For security purposes, there's also the possibility to configure the maximum runtime of the hashing, by default it's 1000 milliseconds, however it can be configured via the `Argon2 Max Time` policy.
+In case the hashing exceeds this time, it will generate a `WARN` in the console.
+
+For parameter optimization, check the [project's benchmark](https://github.com/phxql/argon2-jvm#recommended-parameters) or the [Argon2 whitepaper recommendations](https://github.com/P-H-C/phc-winner-argon2/blob/master/argon2-specs.pdf#section.9).

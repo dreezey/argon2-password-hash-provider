@@ -1,27 +1,29 @@
 package be.cronos.keycloak.policy;
 
+import de.mkammerer.argon2.Argon2Constants;
 import org.keycloak.Config;
-import org.keycloak.models.*;
+import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.KeycloakSessionFactory;
+import org.keycloak.models.RealmModel;
+import org.keycloak.models.UserModel;
 import org.keycloak.policy.PasswordPolicyProvider;
 import org.keycloak.policy.PasswordPolicyProviderFactory;
 import org.keycloak.policy.PolicyError;
 
-public class Argon2ParallelismPasswordPolicyProviderFactory implements PasswordPolicyProvider, PasswordPolicyProviderFactory {
-    public static final String ID = "argon2Parallelism";
+public class Argon2SaltLengthPasswordPolicyProviderFactory implements PasswordPolicyProvider, PasswordPolicyProviderFactory {
+    public static final String ID = "argon2SaltLength";
 
     @Override
-    public Argon2ParallelismPasswordPolicyProviderFactory create(KeycloakSession session) {
+    public Argon2SaltLengthPasswordPolicyProviderFactory create(KeycloakSession session) {
         return this;
     }
 
     @Override
     public void init(Config.Scope config) {
-
     }
 
     @Override
     public void postInit(KeycloakSessionFactory factory) {
-
     }
 
     @Override
@@ -46,7 +48,7 @@ public class Argon2ParallelismPasswordPolicyProviderFactory implements PasswordP
 
     @Override
     public String getDisplayName() {
-        return "Argon2 Parallelism";
+        return "Argon2 Salt Length";
     }
 
     @Override
@@ -56,7 +58,7 @@ public class Argon2ParallelismPasswordPolicyProviderFactory implements PasswordP
 
     @Override
     public String getDefaultConfigValue() {
-        return String.valueOf(1);
+        return String.valueOf(Argon2Constants.DEFAULT_SALT_LENGTH);
     }
 
     @Override
