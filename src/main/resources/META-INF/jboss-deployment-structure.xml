@@ -7,7 +7,7 @@
             <module name="org.keycloak.keycloak-server-spi-private" export="true" />
             <module name="org.keycloak.keycloak-services" export="true" />
             <module name="org.jboss.logging" export="true" />
-            <module name="de.mkammerer.argon2" export="true" />
+            <module name="de.mkammerer.argon2-jvm" export="true" />
         </dependencies>
     </deployment>
 </jboss-deployment-structure>

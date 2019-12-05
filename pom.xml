@@ -49,6 +49,41 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>de.smartics.maven.plugin</groupId>
+                <artifactId>smartics-jboss-modules-maven-plugin</artifactId>
+                <version>2.1.5</version>
+                <executions>
+                    <execution>
+                        <id>create-modules-archive</id>
+                        <goals>
+                            <goal>create-modules-archive</goal>
+                        </goals>
+                        <phase>package</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <dependencyExcludes>
+                        <!-- provided -->
+                        <exclude>
+                            <groupId>org.keycloak</groupId>
+                        </exclude>
+                        <exclude>
+                            <groupId>org.jboss.logging</groupId>
+                            <artifactId>jboss-logging</artifactId>
+                        </exclude>
+                        <!-- no pom file available -->
+                        <exclude>
+                            <groupId>org.apache.logging.log4j</groupId>
+                            <artifactId>log4j-api-java9</artifactId>
+                        </exclude>
+                        <exclude>
+                            <groupId>org.osgi</groupId>
+                            <artifactId>org.osgi.core</artifactId>
+                        </exclude>
+                    </dependencyExcludes>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -74,11 +109,11 @@
             <scope>provided</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/javax.validation/validation-api -->
-        <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
-            <version>2.0.1.Final</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>javax.validation</groupId>-->
+<!--            <artifactId>validation-api</artifactId>-->
+<!--            <version>2.0.1.Final</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>de.mkammerer</groupId>
             <artifactId>argon2-jvm</artifactId>

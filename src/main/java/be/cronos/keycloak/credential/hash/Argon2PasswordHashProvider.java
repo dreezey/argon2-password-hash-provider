@@ -6,6 +6,7 @@ import de.mkammerer.argon2.Argon2Factory;
 import de.mkammerer.argon2.Argon2Factory.Argon2Types;
 import org.jboss.logging.Logger;
 import org.keycloak.credential.hash.PasswordHashProvider;
+import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.PasswordPolicy;
 import org.keycloak.models.credential.PasswordCredentialModel;
 
@@ -24,27 +25,24 @@ public class Argon2PasswordHashProvider implements PasswordHashProvider {
     private final int defaultHashLength;
     private final int defaultSaltLength;
     private final int defaultMaxTime;
-    private PasswordPolicy passwordPolicy;
+    private KeycloakSession session;
 
-    public Argon2PasswordHashProvider(String providerId, Argon2Types defaultArgon2Variant, int defaultIterations, int defaultMemory, int defaultParallelism, int defaultHashLength, int defaultSaltLength, int defaultMaxTime) {
+    public Argon2PasswordHashProvider(String providerId, Argon2Types defaultArgon2Variant, int defaultIterations, int defaultMemory, int defaultParallelism, int defaultHashLength, int defaultSaltLength, int defaultMaxTime, KeycloakSession session) {
         this.providerId = providerId;
         this.defaultArgon2Variant = defaultArgon2Variant;
         this.defaultIterations = defaultIterations;
         this.defaultMemory = defaultMemory;
         this.defaultParallelism = defaultParallelism;
-        this.passwordPolicy = null;
         this.defaultHashLength = defaultHashLength;
         this.defaultSaltLength = defaultSaltLength;
         this.defaultMaxTime = defaultMaxTime;
+        this.session = session;
     }
 
     @Override
     public boolean policyCheck(PasswordPolicy policy, PasswordCredentialModel credential) {
+        LOG.debugf("policyCheck()");
         int policyHashIterations = getDefaultValue(Argon2IterationsPasswordPolicyProviderFactory.ID, defaultIterations);
-
-        // This is hack and is not reliable, policyCheck() is only triggered on password CHANGE (not when setting a new password, or when the admin sets it)
-        // However, due to the argon2.verify function, the variant is included, as well as iterations and memory limit
-        this.passwordPolicy = policy;
 
         return credential.getPasswordCredentialData().getHashIterations() == policyHashIterations
                 && providerId.equals(credential.getPasswordCredentialData().getAlgorithm());
@@ -52,7 +50,7 @@ public class Argon2PasswordHashProvider implements PasswordHashProvider {
 
     @Override
     public PasswordCredentialModel encodedCredential(String rawPassword, int iterations) {
-        LOG.debugf("Argon2 encodedCredential()");
+        LOG.debugf("encodedCredential()");
 
         // Get the Argon2 parameters, or default values
         int argon2Iterations = getDefaultValue(Argon2IterationsPasswordPolicyProviderFactory.ID, defaultIterations);
@@ -79,7 +77,7 @@ public class Argon2PasswordHashProvider implements PasswordHashProvider {
             // Keep track of hashing runtime
             long start = System.currentTimeMillis();
             // Hash the password
-            hash = argon2.hash(argon2Iterations, memoryLimit, parallelism, rawPassword);
+            hash = argon2.hash(argon2Iterations, memoryLimit, parallelism, rawPassword.getBytes());
             // Stop timing
             long end = System.currentTimeMillis();
             // Verify whether the hash time has not exceeded the configured value (or default value)
@@ -101,7 +99,7 @@ public class Argon2PasswordHashProvider implements PasswordHashProvider {
         LOG.debugf("getDefaultValue() providerId = '%s', defaultValue = '%s'", providerId, defaultValue);
         T ret;
         try {
-            ret = passwordPolicy.getPolicyConfig(providerId);
+            ret = this.session.getContext().getRealm().getPasswordPolicy().getPolicyConfig(providerId);
         } catch (Exception e) {
             ret = defaultValue;
         }
@@ -120,7 +118,7 @@ public class Argon2PasswordHashProvider implements PasswordHashProvider {
     @Override
     public boolean verify(String rawPassword, PasswordCredentialModel credential) {
 
-        LOG.debugf("Argon2 verify()");
+        LOG.debugf("verify()");
 
         // Get the Argon2 variant of the credential, should be something like:
         // $argon2i$v=19$m=65535,t=30,p=4$JQUxqirAz7+Em0yM1ZiDFA$LhqtL0XPGESfeHb4lI2XnV4mSZacWGQWANKtvIVVpy4
@@ -144,7 +142,7 @@ public class Argon2PasswordHashProvider implements PasswordHashProvider {
 
         boolean samePassword = false;
         try {
-            if (argon2.verify(credential.getPasswordSecretData().getValue(), rawPassword)) {
+            if (argon2.verify(credential.getPasswordSecretData().getValue(), rawPassword.getBytes())) {
                 LOG.debugf("Passwords match!!");
                 samePassword = true;
             } else {

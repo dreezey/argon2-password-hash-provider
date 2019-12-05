@@ -47,7 +47,6 @@ public class Argon2VariantPasswordPolicyProviderFactory implements PasswordPolic
         try {
             type = Argon2Factory.Argon2Types.valueOf(argonVariant);
         } catch (Exception e) {
-            type = Argon2Factory.Argon2Types.valueOf(DEFAULT_ARGON2_VARIANT);
             throw new PasswordPolicyConfigException("Invalid Argon2 variant, valid choices are: ARGON2i, ARGON2id or ARGON2d.");
         }
         return type;

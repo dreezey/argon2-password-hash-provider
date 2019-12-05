@@ -24,11 +24,9 @@ public class Argon2PasswordHashProviderFactory implements PasswordHashProviderFa
 
     @Override
     public PasswordHashProvider create(KeycloakSession session) {
-        LOG.debugf("Argon2PasswordHashProviderFactory create()");
+        LOG.debugf("create()");
 
-        // Using PasswordPolicy here will generate a StackOverflowError when you change a value.
-//        return new Argon2PasswordHashProvider(ID, Argon2Factory.Argon2Types.ARGON2id, DEFAULT_ITERATIONS, DEFAULT_MEMORY, DEFAULT_PARALLELISM, session.getContext().getRealm().getPasswordPolicy());
-        return new Argon2PasswordHashProvider(ID, Argon2Types.ARGON2id, DEFAULT_ITERATIONS, DEFAULT_MEMORY, DEFAULT_PARALLELISM, Argon2Constants.DEFAULT_HASH_LENGTH, Argon2Constants.DEFAULT_SALT_LENGTH, DEFAULT_MAX_TIME);
+        return new Argon2PasswordHashProvider(ID, Argon2Types.ARGON2id, DEFAULT_ITERATIONS, DEFAULT_MEMORY, DEFAULT_PARALLELISM, Argon2Constants.DEFAULT_HASH_LENGTH, Argon2Constants.DEFAULT_SALT_LENGTH, DEFAULT_MAX_TIME, session);
     }
 
     @Override
