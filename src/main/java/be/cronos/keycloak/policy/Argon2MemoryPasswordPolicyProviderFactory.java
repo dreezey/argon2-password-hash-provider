@@ -11,6 +11,7 @@ import org.keycloak.policy.PolicyError;
 
 public class Argon2MemoryPasswordPolicyProviderFactory implements PasswordPolicyProvider, PasswordPolicyProviderFactory {
     public static final String ID = "argon2Memory";
+    private final int DEFAULT_ARGON2_MEMORY = 65536;
 
     @Override
     public Argon2MemoryPasswordPolicyProviderFactory create(KeycloakSession session) {
@@ -57,7 +58,7 @@ public class Argon2MemoryPasswordPolicyProviderFactory implements PasswordPolicy
 
     @Override
     public String getDefaultConfigValue() {
-        return String.valueOf(65535);
+        return String.valueOf(DEFAULT_ARGON2_MEMORY);
     }
 
     @Override
