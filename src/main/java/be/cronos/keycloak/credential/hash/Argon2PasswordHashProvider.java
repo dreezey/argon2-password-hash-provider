@@ -1,8 +1,7 @@
 package be.cronos.keycloak.credential.hash;
 
 import be.cronos.keycloak.policy.*;
-import de.mkammerer.argon2.Argon2;
-import de.mkammerer.argon2.Argon2Factory;
+import be.cronos.keycloak.utils.Argon2Helper;
 import de.mkammerer.argon2.Argon2Factory.Argon2Types;
 import org.jboss.logging.Logger;
 import org.keycloak.credential.hash.PasswordHashProvider;
@@ -12,6 +11,9 @@ import org.keycloak.models.credential.PasswordCredentialModel;
 
 import java.security.SecureRandom;
 
+/**
+ * @author <a href="mailto:dries.eestermans@is4u.be">Dries Eestermans</a>
+ */
 public class Argon2PasswordHashProvider implements PasswordHashProvider {
 
     private static final Logger LOG = Logger.getLogger(Argon2PasswordHashProvider.class);
@@ -70,23 +72,16 @@ public class Argon2PasswordHashProvider implements PasswordHashProvider {
         LOG.debugf("\tSalt Length: %d", saltLength);
         LOG.debugf("\tMaximum time for hashing (in ms): %d", maxTime);
 
-        Argon2 argon2 = Argon2Factory.createAdvanced(argon2Variant, defaultSaltLength, defaultHashLength);
-        String hash;
+        // Keep track of hashing runtime
+        long start = System.currentTimeMillis();
+        String hash = Argon2Helper.hashPassword(rawPassword, argon2Variant, argon2Iterations, parallelism, memoryLimit, hashLength, saltLength);
+        // Stop timing
+        long end = System.currentTimeMillis();
 
-        try {
-            // Keep track of hashing runtime
-            long start = System.currentTimeMillis();
-            // Hash the password
-            hash = argon2.hash(argon2Iterations, memoryLimit, parallelism, rawPassword.getBytes());
-            // Stop timing
-            long end = System.currentTimeMillis();
-            // Verify whether the hash time has not exceeded the configured value (or default value)
-            LOG.debugf("Hashing runtime was %d milliseconds (%d seconds).", end-start, (end-start)/1000);
-            if (end - start > maxTime) {
-                LOG.warnf("Hash time exceeded configured maximum time: '%d ms', consider tuning the parameter 'Argon2 Iterations'.", maxTime);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        // Verify whether the hash time has not exceeded the configured value (or default value)
+        LOG.debugf("Hashing runtime was %d milliseconds (%d seconds).", end-start, (end-start)/1000);
+        if (end - start > maxTime) {
+            LOG.warnf("Hash time exceeded configured maximum time: '%d ms', consider tuning the parameter 'Argon2 Iterations'.", maxTime);
         }
 
         // Salt doesn't matter here
@@ -120,38 +115,7 @@ public class Argon2PasswordHashProvider implements PasswordHashProvider {
 
         LOG.debugf("verify()");
 
-        // Get the Argon2 variant of the credential, should be something like:
-        // $argon2i$v=19$m=65535,t=30,p=4$JQUxqirAz7+Em0yM1ZiDFA$LhqtL0XPGESfeHb4lI2XnV4mSZacWGQWANKtvIVVpy4
-        // however, the variant's case is not correct for the enum
-        String storedVariant = credential.getPasswordSecretData().getValue().split("\\$")[1];
-        Argon2Types storedArgon2Variant = null;
-        try {
-            for (Argon2Types argon2Type : Argon2Types.values()) {
-                if (argon2Type.toString().equalsIgnoreCase(storedVariant)) {
-                    storedArgon2Variant = argon2Type;
-                    LOG.debugf("Stored variant found: %s", storedVariant);
-                }
-            }
-            if (storedArgon2Variant == null) throw new Exception("Unknown stored Argon2 variant");
-        } catch (Exception e) {
-            throw new RuntimeException("Unknown stored Argon2 variant, is someone spoofing?");
-        }
-
-        // Now make sure to select the correct variant for the Argon2Factory
-        Argon2 argon2 = Argon2Factory.createAdvanced(storedArgon2Variant);
-
-        boolean samePassword = false;
-        try {
-            if (argon2.verify(credential.getPasswordSecretData().getValue(), rawPassword.getBytes())) {
-                LOG.debugf("Passwords match!!");
-                samePassword = true;
-            } else {
-                LOG.debugf("Passwords don't match!!");
-            }
-        } catch (Exception e) {
-            LOG.debugf("Couldn't compare password, exception occurred: %s", e.getMessage());
-        }
-        return samePassword;
+        return Argon2Helper.verifyPassword(rawPassword, credential);
     }
 
     @Override

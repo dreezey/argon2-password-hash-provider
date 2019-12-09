@@ -1,6 +1,5 @@
 package be.cronos.keycloak.policy;
 
-import de.mkammerer.argon2.Argon2Constants;
 import org.keycloak.Config;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
@@ -10,6 +9,9 @@ import org.keycloak.policy.PasswordPolicyProvider;
 import org.keycloak.policy.PasswordPolicyProviderFactory;
 import org.keycloak.policy.PolicyError;
 
+/**
+ * @author <a href="mailto:dries.eestermans@is4u.be">Dries Eestermans</a>
+ */
 public class Argon2MaxTimePasswordPolicyProviderFactory implements PasswordPolicyProvider, PasswordPolicyProviderFactory {
     public static final String ID = "argon2MaxTime";
 

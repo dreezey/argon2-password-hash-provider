@@ -9,6 +9,9 @@ import org.keycloak.credential.hash.PasswordHashProviderFactory;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 
+/**
+ * @author <a href="mailto:dries.eestermans@is4u.be">Dries Eestermans</a>
+ */
 public class Argon2PasswordHashProviderFactory implements PasswordHashProviderFactory {
     private static final Logger LOG = Logger.getLogger(Argon2PasswordHashProviderFactory.class);
 

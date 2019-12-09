@@ -9,6 +9,9 @@ import org.keycloak.policy.PasswordPolicyProvider;
 import org.keycloak.policy.PasswordPolicyProviderFactory;
 import org.keycloak.policy.PolicyError;
 
+/**
+ * @author <a href="mailto:dries.eestermans@is4u.be">Dries Eestermans</a>
+ */
 public class Argon2MemoryPasswordPolicyProviderFactory implements PasswordPolicyProvider, PasswordPolicyProviderFactory {
     public static final String ID = "argon2Memory";
     private final int DEFAULT_ARGON2_MEMORY = 65536;
