@@ -18,6 +18,15 @@ mkdir -p ./modules/system/layers/custom
 
 Now simply copy the 2 jboss modules folders into the `custom` directory in Keycloak modules.
 
+# System Dependencies
+When running Keycloak on CentOS 7 (or another EL7), install argon2 system library:
+```
+yum install -y epel-release;
+yum install -y argon2;
+```
+
+Once this is complete, restart Keycloak.
+
 # Module deployment
 Once the dependencies are in order, you can deploy the module either via the `modules` directory, or hot deployment.
 
