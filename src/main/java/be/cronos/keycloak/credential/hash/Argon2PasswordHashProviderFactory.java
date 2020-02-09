@@ -27,8 +27,6 @@ public class Argon2PasswordHashProviderFactory implements PasswordHashProviderFa
 
     @Override
     public PasswordHashProvider create(KeycloakSession session) {
-        LOG.debugf("create()");
-
         return new Argon2PasswordHashProvider(ID, Argon2Types.ARGON2id, DEFAULT_ITERATIONS, DEFAULT_MEMORY, DEFAULT_PARALLELISM, Argon2Constants.DEFAULT_HASH_LENGTH, Argon2Constants.DEFAULT_SALT_LENGTH, DEFAULT_MAX_TIME, session);
     }
 
