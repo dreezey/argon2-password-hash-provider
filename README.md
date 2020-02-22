@@ -1,24 +1,27 @@
-# Dependencies
-This module depends on `de.mkammerer.argon2`, more can be found on the [GitHub Project](https://github.com/phxql/argon2-jvm).
+# Introduction
+This project introduces Argon2 Password Hashing for Keycloak, it uses `de.mkammerer.argon2` as the library, more can be found on the [GitHub Project](https://github.com/phxql/argon2-jvm).
 
-## Dependency installation
-Build the project once with `mvn install`, this will generate the `./target/jboss-modules/` directory, with two dependencies:
-* de.mkammerer.argon2-jvm
-* net.java.dev.jna
+It generates an EAR which can be deployed using [Keycloak Deployer](https://www.keycloak.org/docs/latest/server_development/index.html#using-the-keycloak-deployer). 
 
-In your Keycloak installation, go to `./modules/` and modify the `layers.conf`:
+# Build
+Build the project using:
 ```
-layers=keycloak,custom
+mvn clean install;
 ```
 
-And create the directory in `./modules/`:
+This will build both the `jar-module` and `ear-module`:
 ```
-mkdir -p ./modules/system/layers/custom;
+[INFO] Reactor Summary for Argon2 Password Hash Provider 9.0.0:
+[INFO] 
+[INFO] Argon2 Password Hash Provider ...................... SUCCESS [  0.633 s]
+[INFO] Argon2 Password Hash Provider Module ............... SUCCESS [  3.264 s]
+[INFO] Argon2 Password Hash Provider Bundle ............... SUCCESS [  0.348 s]
 ```
 
-Now simply copy the 2 dependencies (generated in `./target/jboss-modules`) folders into the `custom` directory in Keycloak modules, e.g.:
+# Installation
+The EAR will contain all the necessary dependencies, therefore you can hot-deploy the module without additional configuration:
 ```
-cp -R ./target/jboss-modules/de ./target/jboss-modules/net /opt/keycloak/modules/system/layers/custom/;
+cp ear-module/target/argon2-password-hash-provider-bundle-9.0.0.ear /opt/keycloak/standalone/deployments/;
 ```
 
 # System Dependencies
@@ -28,15 +31,7 @@ yum install -y epel-release;
 yum install -y argon2;
 ```
 
-Once this is complete, restart Keycloak.
-
-# Provider deployment
-Once the dependencies are in order, the provider can be deployed by the [Keycloak Deployer](https://www.keycloak.org/docs/latest/server_development/index.html#using-the-keycloak-deployer), e.g.:
-```
-cp ./target/argon2-password-hash-provider-9.0.0.jar /opt/keycloak/standalone/deployments/;
-```
-
-Keycloak will then load the provider when started (it also supports hot-deployments).
+Once this is complete, start Keycloak.
 
 # Keycloak configuration
 Finally, in the Keycloak realm of your choosing, activate the Argon2 password hashing via:
