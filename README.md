@@ -2,7 +2,7 @@
 This module depends on `de.mkammerer.argon2`, more can be found on the [GitHub Project](https://github.com/phxql/argon2-jvm).
 
 ## Dependency installation
-Build the project once with `mvn install`, this will generate the `target/jboss-modules/` directory, with two dependencies:
+Build the project once with `mvn install`, this will generate the `./target/jboss-modules/` directory, with two dependencies:
 * de.mkammerer.argon2-jvm
 * net.java.dev.jna
 
@@ -13,10 +13,13 @@ layers=keycloak,custom
 
 And create the directory in `./modules/`:
 ```
-mkdir -p ./modules/system/layers/custom
+mkdir -p ./modules/system/layers/custom;
 ```
 
-Now simply copy the 2 jboss modules folders into the `custom` directory in Keycloak modules.
+Now simply copy the 2 dependencies (generated in `./target/jboss-modules`) folders into the `custom` directory in Keycloak modules, e.g.:
+```
+cp -R ./target/jboss-modules/de ./target/jboss-modules/net /opt/keycloak/modules/system/layers/custom/;
+```
 
 # System Dependencies
 When running Keycloak on CentOS 7 (or another EL7), install argon2 system library:
@@ -27,8 +30,13 @@ yum install -y argon2;
 
 Once this is complete, restart Keycloak.
 
-# Module deployment
-Once the dependencies are in order, you can deploy the module either via the `modules` directory, or hot deployment.
+# Provider deployment
+Once the dependencies are in order, the provider can be deployed by the [Keycloak Deployer](https://www.keycloak.org/docs/latest/server_development/index.html#using-the-keycloak-deployer), e.g.:
+```
+cp ./target/argon2-password-hash-provider-9.0.0.jar /opt/keycloak/standalone/deployments/;
+```
+
+Keycloak will then load the provider when started (it also supports hot-deployments).
 
 # Keycloak configuration
 Finally, in the Keycloak realm of your choosing, activate the Argon2 password hashing via:
