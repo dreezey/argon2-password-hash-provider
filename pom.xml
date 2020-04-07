@@ -2,14 +2,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <name>Argon2 Password Hash Provider</name>
-    <parent>
-        <groupId>org.keycloak</groupId>
-        <artifactId>keycloak-parent</artifactId>
-        <version>9.0.0</version>
-    </parent>
 
     <groupId>be.cronos.keycloak</groupId>
     <artifactId>argon2-password-hash-provider</artifactId>
+    <version>1.0.0</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -21,9 +17,12 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-
+        <keycloak.version>9.0.2</keycloak.version>
         <argon2jvm.version>2.6</argon2jvm.version>
+        <junit.version>4.13</junit.version>
     </properties>
+
+
 
     <build>
         <plugins>
@@ -44,6 +43,13 @@
                     <skip>true</skip>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>3.7.0.1746</version>
+            </plugin>
+
         </plugins>
     </build>
 

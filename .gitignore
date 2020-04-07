@@ -1,4 +1,6 @@
-/target/
+target/
+ear-module/target/
+jar-module/target/
 *.iml
 .idea/
 *.sh

@@ -1,5 +1,5 @@
 # Introduction
-This project introduces Argon2 Password Hashing for Keycloak, it uses `de.mkammerer.argon2` as the library, more can be found on the [GitHub Project](https://github.com/phxql/argon2-jvm).
+This project introduces Argon2 Password Hashing for Keycloak (version 8.0.0 and above), it uses `de.mkammerer.argon2` as the library, more can be found on the [GitHub Project](https://github.com/phxql/argon2-jvm).
 
 It generates an EAR which can be deployed using [Keycloak Deployer](https://www.keycloak.org/docs/latest/server_development/index.html#using-the-keycloak-deployer). 
 
@@ -11,7 +11,7 @@ mvn clean install;
 
 This will build both the `jar-module` and `ear-module`:
 ```
-[INFO] Reactor Summary for Argon2 Password Hash Provider 9.0.0:
+[INFO] Reactor Summary for Argon2 Password Hash Provider 1.0.0:
 [INFO] 
 [INFO] Argon2 Password Hash Provider ...................... SUCCESS [  0.633 s]
 [INFO] Argon2 Password Hash Provider Module ............... SUCCESS [  3.264 s]
@@ -21,7 +21,7 @@ This will build both the `jar-module` and `ear-module`:
 # Installation
 The EAR will contain all the necessary dependencies, therefore you can hot-deploy the module without additional configuration:
 ```
-cp ear-module/target/argon2-password-hash-provider-bundle-9.0.0.ear /opt/keycloak/standalone/deployments/;
+cp ear-module/target/argon2-password-hash-provider-bundle-*.ear /opt/keycloak/standalone/deployments/;
 ```
 
 # System Dependencies
