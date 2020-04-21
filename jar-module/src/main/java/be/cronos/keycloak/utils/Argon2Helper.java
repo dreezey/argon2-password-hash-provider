@@ -1,5 +1,6 @@
 package be.cronos.keycloak.utils;
 
+import be.cronos.keycloak.exceptions.Argon2RuntimeException;
 import de.mkammerer.argon2.Argon2;
 import de.mkammerer.argon2.Argon2Factory;
 import org.jboss.logging.Logger;
@@ -11,23 +12,29 @@ import org.keycloak.models.credential.PasswordCredentialModel;
 public class Argon2Helper {
     private static final Logger LOG = Logger.getLogger(Argon2Helper.class);
 
+    private Argon2Helper() {
+        throw new IllegalStateException("Helper class");
+    }
+
     public static String hashPassword(String rawPassword, Argon2Factory.Argon2Types argon2Variant, int iterations,
                                       int parallelism, int memoryLimit, int hashLength, int saltLength) {
-        if (rawPassword == null) throw new RuntimeException("Password can't be empty");
+        if (rawPassword == null) throw new Argon2RuntimeException("Password can't be empty");
         Argon2 argon2 = Argon2Factory.createAdvanced(argon2Variant, saltLength, hashLength);
         String hash;
 
         try {
             // Hash the password
             hash = argon2.hash(iterations, memoryLimit, parallelism, rawPassword.toCharArray());
+            return hash;
+        } catch (IllegalStateException ise) {
+            LOG.errorf("Something is wrong with the parameters, message = '%s'", ise.getMessage());
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            LOG.errorf("Something went wrong while hashing the password, message = '%s'", e.getMessage());
         }
-        return hash;
+        throw new Argon2RuntimeException("Something went wrong while securing the password.");
     }
 
-    public static boolean verifyPassword(String rawPassword,
-                                         PasswordCredentialModel credential) {
+    public static boolean verifyPassword(String rawPassword, PasswordCredentialModel credential) {
         // Get the Argon2 variant of the credential, should be something like:
         // $argon2i$v=19$m=65535,t=30,p=4$JQUxqirAz7+Em0yM1ZiDFA$LhqtL0XPGESfeHb4lI2XnV4mSZacWGQWANKtvIVVpy4
         // however, the variant's case is not correct for the enum
@@ -40,9 +47,9 @@ public class Argon2Helper {
                     LOG.debugf("Stored variant found: %s", storedVariant);
                 }
             }
-            if (storedArgon2Variant == null) throw new Exception("Unknown stored Argon2 variant");
-        } catch (Exception e) {
-            throw new RuntimeException("Unknown stored Argon2 variant, is someone spoofing?");
+            if (storedArgon2Variant == null) throw new Argon2RuntimeException("Unknown stored Argon2 variant");
+        } catch (Argon2RuntimeException e) {
+            throw new Argon2RuntimeException(e.getMessage());
         }
 
         // Now make sure to select the correct variant for the Argon2Factory
@@ -57,7 +64,7 @@ public class Argon2Helper {
                 LOG.debugf("Passwords don't match!!");
             }
         } catch (Exception e) {
-            LOG.debugf("Couldn't compare password, exception occurred: %s", e.getMessage());
+            LOG.errorf("Couldn't compare password, exception occurred: %s", e.getMessage());
         }
         return samePassword;
     }

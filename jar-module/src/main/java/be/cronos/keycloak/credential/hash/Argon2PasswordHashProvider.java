@@ -2,14 +2,13 @@ package be.cronos.keycloak.credential.hash;
 
 import be.cronos.keycloak.policy.*;
 import be.cronos.keycloak.utils.Argon2Helper;
+import de.mkammerer.argon2.Argon2Constants;
 import de.mkammerer.argon2.Argon2Factory.Argon2Types;
 import org.jboss.logging.Logger;
 import org.keycloak.credential.hash.PasswordHashProvider;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.PasswordPolicy;
 import org.keycloak.models.credential.PasswordCredentialModel;
-
-import java.security.SecureRandom;
 
 /**
  * @author <a href="mailto:dries.eestermans@is4u.be">Dries Eestermans</a>
@@ -20,31 +19,19 @@ public class Argon2PasswordHashProvider implements PasswordHashProvider {
 
     private final String providerId;
 
-    private final Argon2Types defaultArgon2Variant;
-    private final int defaultIterations;
-    private final int defaultMemory;
-    private final int defaultParallelism;
-    private final int defaultHashLength;
-    private final int defaultSaltLength;
-    private final int defaultMaxTime;
+    private static final Argon2Types DEFAULT_ARGON_2_VARIANT = Argon2Types.ARGON2id;
+    private static final int DEFAULT_ITERATIONS = 1;
     private KeycloakSession session;
 
-    public Argon2PasswordHashProvider(String providerId, Argon2Types defaultArgon2Variant, int defaultIterations, int defaultMemory, int defaultParallelism, int defaultHashLength, int defaultSaltLength, int defaultMaxTime, KeycloakSession session) {
+    public Argon2PasswordHashProvider(String providerId, KeycloakSession session) {
         this.providerId = providerId;
-        this.defaultArgon2Variant = defaultArgon2Variant;
-        this.defaultIterations = defaultIterations;
-        this.defaultMemory = defaultMemory;
-        this.defaultParallelism = defaultParallelism;
-        this.defaultHashLength = defaultHashLength;
-        this.defaultSaltLength = defaultSaltLength;
-        this.defaultMaxTime = defaultMaxTime;
         this.session = session;
     }
 
     @Override
     public boolean policyCheck(PasswordPolicy policy, PasswordCredentialModel credential) {
         LOG.debugf("policyCheck()");
-        int policyHashIterations = getDefaultValue(Argon2IterationsPasswordPolicyProviderFactory.ID, defaultIterations);
+        int policyHashIterations = getDefaultValue(Argon2IterationsPasswordPolicyProviderFactory.ID, DEFAULT_ITERATIONS);
 
         return credential.getPasswordCredentialData().getHashIterations() == policyHashIterations
                 && providerId.equals(credential.getPasswordCredentialData().getAlgorithm());
@@ -55,13 +42,13 @@ public class Argon2PasswordHashProvider implements PasswordHashProvider {
         LOG.debugf("encodedCredential()");
 
         // Get the Argon2 parameters, or default values
-        int argon2Iterations = getDefaultValue(Argon2IterationsPasswordPolicyProviderFactory.ID, defaultIterations);
-        int parallelism = getDefaultValue(Argon2ParallelismPasswordPolicyProviderFactory.ID, defaultParallelism);
-        int memoryLimit = getDefaultValue(Argon2MemoryPasswordPolicyProviderFactory.ID, defaultMemory);
-        int hashLength = getDefaultValue(Argon2HashLengthPasswordPolicyProviderFactory.ID, defaultHashLength);
-        int saltLength = getDefaultValue(Argon2SaltLengthPasswordPolicyProviderFactory.ID, defaultSaltLength);
-        Argon2Types argon2Variant = getDefaultValue(Argon2VariantPasswordPolicyProviderFactory.ID, defaultArgon2Variant);
-        int maxTime = getDefaultValue(Argon2MaxTimePasswordPolicyProviderFactory.ID, defaultMaxTime);
+        int argon2Iterations = getDefaultValue(Argon2IterationsPasswordPolicyProviderFactory.ID, DEFAULT_ITERATIONS);
+        int parallelism = getDefaultValue(Argon2ParallelismPasswordPolicyProviderFactory.ID, 1);
+        int memoryLimit = getDefaultValue(Argon2MemoryPasswordPolicyProviderFactory.ID, 65536);
+        int hashLength = getDefaultValue(Argon2HashLengthPasswordPolicyProviderFactory.ID, Argon2Constants.DEFAULT_HASH_LENGTH);
+        int saltLength = getDefaultValue(Argon2SaltLengthPasswordPolicyProviderFactory.ID, Argon2Constants.DEFAULT_SALT_LENGTH);
+        Argon2Types argon2Variant = getDefaultValue(Argon2VariantPasswordPolicyProviderFactory.ID, DEFAULT_ARGON_2_VARIANT);
+        int maxTime = getDefaultValue(Argon2MaxTimePasswordPolicyProviderFactory.ID, 1000);
 
         LOG.debugf("Using the following Argon2 settings:");
         LOG.debugf("\tArgon2 Variant: %s", argon2Variant);
@@ -104,10 +91,7 @@ public class Argon2PasswordHashProvider implements PasswordHashProvider {
     }
 
     private byte[] getSalt() {
-        byte[] buffer = new byte[16];
-        SecureRandom secureRandom = new SecureRandom();
-        secureRandom.nextBytes(buffer);
-        return buffer;
+        return "0123456789abcdef".getBytes();
     }
 
     @Override
@@ -120,6 +104,6 @@ public class Argon2PasswordHashProvider implements PasswordHashProvider {
 
     @Override
     public void close() {
-
+        // noop
     }
 }
