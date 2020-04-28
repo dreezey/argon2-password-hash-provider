@@ -11,7 +11,7 @@ mvn clean install;
 
 This will build both the `jar-module` and `ear-module`:
 ```
-[INFO] Reactor Summary for Argon2 Password Hash Provider 1.1.0:
+[INFO] Reactor Summary for Argon2 Password Hash Provider x.y.z:
 [INFO] 
 [INFO] Argon2 Password Hash Provider ...................... SUCCESS [  0.633 s]
 [INFO] Argon2 Password Hash Provider Module ............... SUCCESS [  3.264 s]
