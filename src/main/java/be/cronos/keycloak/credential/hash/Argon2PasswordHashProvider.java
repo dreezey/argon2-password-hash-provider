@@ -27,14 +27,20 @@ public class Argon2PasswordHashProvider implements PasswordHashProvider {
     @Override
     public boolean policyCheck(PasswordPolicy policy, PasswordCredentialModel credential) {
         LOG.debugf("> policyCheck()");
+        // Check it it is an argon2 encoded password.
+        if (!providerId.equals(credential.getPasswordCredentialData().getAlgorithm())) {
+            LOG.debugf("< policyCheck() -> Stored password uses a different algorithm and hence does not meet the Realm Password Policy.");
+            return false;
+        }
+        // The stored password is a argon2 hash and hence checking the specific parameters of the policy is required.
+
         // Get the credential's Argon2 parameters
         Argon2EncodingUtils.Argon2Parameters storedArgon2Parameters = Argon2EncodingUtils.extractArgon2ParametersFromEncodedPassword(credential.getPasswordSecretData().getValue());
         // Get the configured Argon2 parameters
         Argon2EncodingUtils.Argon2Parameters configuredArgon2Parameters = getConfiguredArgon2Parameters();
 
         // Perform a comparison on whether a re-hash is needed
-        boolean meetsRealmPolicy = providerId.equals(credential.getPasswordCredentialData().getAlgorithm())
-                && storedArgon2Parameters.getArgon2Variant().getArgon2BouncyCastle() == configuredArgon2Parameters.getArgon2Variant().getArgon2BouncyCastle()
+        boolean meetsRealmPolicy = storedArgon2Parameters.getArgon2Variant().getArgon2BouncyCastle() == configuredArgon2Parameters.getArgon2Variant().getArgon2BouncyCastle()
                 && storedArgon2Parameters.getVersion() == configuredArgon2Parameters.getVersion()
                 && storedArgon2Parameters.getMemory() == configuredArgon2Parameters.getMemory()
                 && storedArgon2Parameters.getIterations() == configuredArgon2Parameters.getIterations()
