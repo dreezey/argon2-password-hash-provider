@@ -2,6 +2,7 @@ package be.cronos.keycloak.policy;
 
 import be.cronos.keycloak.enums.Argon2Variant;
 import org.keycloak.policy.PasswordPolicyConfigException;
+import org.keycloak.policy.PasswordPolicyProvider;
 
 /**
  * @author <a href="mailto:dries.eestermans@is4u.be">Dries Eestermans</a>
@@ -32,4 +33,9 @@ public class Argon2VariantPasswordPolicyProviderFactory extends Argon2GenericPol
         return String.valueOf(DEFAULT_ARGON2_VARIANT);
     }
 
+
+    @Override
+    public String getConfigType() {
+        return PasswordPolicyProvider.STRING_CONFIG_TYPE;
+    }
 }
